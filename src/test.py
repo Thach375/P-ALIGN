@@ -17,7 +17,7 @@ def process_data(json_filename, file_name, llm, batch_size, tokenizer, sampling_
             answer_key = next((key for key in ['answer', 'target', 'solution', 'ground_truth'] if key in item), None)
             if not problem_key or not answer_key:
                 continue
-            prompt_ori = f"Please reason step by step, and put your final answer within \\boxed{{}}.{problem}"
+            prompt_ori = f"Please reason step by step, and put your final answer within \\boxed{{}}.{item[problem_key]}"
             group["prompt_ori"] = prompt_ori
             group["answer"] = item[answer_key]
             data.append(group)
