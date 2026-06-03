@@ -1,4 +1,3 @@
-%%writefile /content/P-ALIGN/src/test.py
 import jsonlines
 from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
