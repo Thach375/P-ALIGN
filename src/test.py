@@ -1,3 +1,4 @@
+%%writefile /content/P-ALIGN/src/test.py
 import jsonlines
 from transformers import AutoTokenizer
 from vllm import LLM, SamplingParams
@@ -5,6 +6,11 @@ import json
 import os
 from tqdm import tqdm
 import argparse
+
+
+def split_list(lst, n):
+    """Chia danh sách prompt thành các batch kích thước n."""
+    return [lst[i:i + n] for i in range(0, len(lst), n)]
 
 
 def process_data(json_filename, file_name, llm, batch_size, tokenizer, sampling_params):
@@ -17,7 +23,7 @@ def process_data(json_filename, file_name, llm, batch_size, tokenizer, sampling_
             answer_key = next((key for key in ['answer', 'target', 'solution', 'ground_truth'] if key in item), None)
             if not problem_key or not answer_key:
                 continue
-            prompt_ori = f"Please reason step by step, and put your final answer within \\boxed{{}}.{item[problem_key]}"
+            prompt_ori = f"Please reason step by step, and put your final answer within \\boxed{{}}. {item[problem_key]}"
             group["prompt_ori"] = prompt_ori
             group["answer"] = item[answer_key]
             data.append(group)
@@ -44,13 +50,13 @@ def process_data(json_filename, file_name, llm, batch_size, tokenizer, sampling_
             results.append(generated_list)
 
     for result, item in zip(results, data):
-        item["output"] = result  
+        item["output"] = result
 
     with open(file_name, "w") as file:
         for item in data:
             json_line = json.dumps(item, ensure_ascii=False)
             file.write(json_line + "\n")
-    print(f"✅ 数据已成功写入 {file_name}\n")
+    print(f"✅ Đã ghi kết quả vào {file_name}\n")
 
 
 def main():
